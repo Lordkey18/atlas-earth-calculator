@@ -107,6 +107,10 @@ button.reset:hover {
     color: #4CAF50; /* Vert */
 }
 
+p {
+    margin: 5px 0;
+}
+
 /* Optimisation mobile */
 @media (max-width: 600px) {
     header {
