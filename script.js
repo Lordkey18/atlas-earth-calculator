@@ -30,9 +30,12 @@ function calculateIncome() {
     const legendary = parseInt(document.getElementById('legendary').value) || 0;
     const boost = parseInt(document.getElementById('boost').value) || 1;
 
-    // Revenu total par seconde
-    const totalPerSecond = (common * RATES.common + rare * RATES.rare + 
-                           epic * RATES.epic + legendary * RATES.legendary) * boost;
+    // Revenu total par seconde sans boost
+    const basePerSecond = common * RATES.common + rare * RATES.rare + 
+                         epic * RATES.epic + legendary * RATES.legendary;
+    
+    // Appliquer le boost au total
+    const totalPerSecond = basePerSecond * boost;
 
     // Conversions
     const hourly = totalPerSecond * 3600;
