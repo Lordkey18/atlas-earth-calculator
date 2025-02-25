@@ -1,9 +1,9 @@
-// Loyers de base par seconde
+// Loyers de base par seconde (valeurs corrigées)
 const RATES = {
-    common: 0.000000001111,
-    rare: 0.000000002222,
-    epic: 0.000000004444,
-    legendary: 0.00000002222
+    common: 0.0000000011,
+    rare: 0.0000000016,
+    epic: 0.0000000022,
+    legendary: 0.0000000044
 };
 
 // Charger les données sauvegardées au démarrage
