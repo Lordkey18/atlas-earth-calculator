@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atlas Earth Calculator</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+</head>
+<body>
+    <h1>Calcul de Revenu Atlas Earth</h1>
+    <div>
+        <h2>Ajouter des parcelles</h2>
+        <label>Commun : <input type="number" id="common" min="0" value="0"></label><br>
+        <label>Rare : <input type="number" id="rare" min="0" value="0"></label><br>
+        <label>Épique : <input type="number" id="epic" min="0" value="0"></label><br>
+        <label>Légendaire : <input type="number" id="legendary" min="0" value="0"></label><br>
+        <label>Boost : 
+            <select id="boost">
+                <option value="1">Aucun (x1)</option>
+                <option value="10">x10</option>
+                <option value="15">x15</option>
+                <option value="20">x20</option>
+                <option value="50">x50</option>
+            </select>
+        </label><br>
+        <button onclick="resetData()">Réinitialiser</button>
+    </div>
+    <div id="results">
+        <h2>Résultats</h2>
+        <p>Heure : <span id="hourly">$0</span></p>
+        <p>Jour : <span id="daily">$0</span></p>
+        <p>Semaine : <span id="weekly">$0</span></p>
+        <p>Mois : <span id="monthly">$0</span></p>
+        <p>Année : <span id="yearly">$0</span></p>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
