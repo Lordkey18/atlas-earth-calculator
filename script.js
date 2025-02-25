@@ -1,4 +1,4 @@
-// Loyers de base par seconde (valeurs corrigées)
+// Loyers de base par seconde
 const RATES = {
     common: 0.0000000011,
     rare: 0.0000000016,
@@ -14,6 +14,7 @@ window.onload = () => {
     document.getElementById('epic').value = savedData.epic || 0;
     document.getElementById('legendary').value = savedData.legendary || 0;
     document.getElementById('boost').value = savedData.boost || 1;
+    document.getElementById('badges').value = savedData.badges || 0;
     calculateIncome();
 
     // Recalcul en temps réel
@@ -22,6 +23,16 @@ window.onload = () => {
     });
 };
 
+// Calculer le boost des badges
+function getBadgeBoost(badges) {
+    if (badges >= 101) return 1.25; // 25%
+    if (badges >= 61) return 1.20;  // 20%
+    if (badges >= 31) return 1.15;  // 15%
+    if (badges >= 11) return 1.10;  // 10%
+    if (badges >= 1) return 1.05;   // 5%
+    return 1;                       // 0%
+}
+
 // Calculer les revenus
 function calculateIncome() {
     const common = parseInt(document.getElementById('common').value) || 0;
@@ -29,13 +40,17 @@ function calculateIncome() {
     const epic = parseInt(document.getElementById('epic').value) || 0;
     const legendary = parseInt(document.getElementById('legendary').value) || 0;
     const boost = parseInt(document.getElementById('boost').value) || 1;
+    const badges = parseInt(document.getElementById('badges').value) || 0;
 
     // Revenu total par seconde sans boost
     const basePerSecond = common * RATES.common + rare * RATES.rare + 
                          epic * RATES.epic + legendary * RATES.legendary;
     
-    // Appliquer le boost au total
-    const totalPerSecond = basePerSecond * boost;
+    // Appliquer le boost des badges d'abord
+    const badgeBoostedPerSecond = basePerSecond * getBadgeBoost(badges);
+    
+    // Appliquer le boost principal ensuite
+    const totalPerSecond = badgeBoostedPerSecond * boost;
 
     // Conversions
     const hourly = totalPerSecond * 3600;
@@ -52,8 +67,15 @@ function calculateIncome() {
     document.getElementById('yearly').textContent = `$${yearly.toFixed(6)}`;
 
     // Sauvegarder les données
-    const data = { common, rare, epic, legendary, boost };
+    const data = { common, rare, epic, legendary, boost, badges };
     localStorage.setItem('atlasEarthData', JSON.stringify(data));
+}
+
+// Incrémenter une parcelle
+function increment(type) {
+    const input = document.getElementById(type);
+    input.value = (parseInt(input.value) || 0) + 1;
+    calculateIncome();
 }
 
 // Réinitialiser les données
@@ -64,5 +86,6 @@ function resetData() {
     document.getElementById('epic').value = 0;
     document.getElementById('legendary').value = 0;
     document.getElementById('boost').value = 1;
+    document.getElementById('badges').value = 0;
     calculateIncome();
 }

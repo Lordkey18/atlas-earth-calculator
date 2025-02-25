@@ -9,66 +9,89 @@ header {
     background-color: #4CAF50; /* Vert */
     color: white;
     text-align: center;
-    padding: 20px;
+    padding: 15px;
 }
 
 main {
     max-width: 800px;
-    margin: 20px auto;
-    padding: 0 20px;
+    margin: 10px auto;
+    padding: 0 10px;
 }
 
 .input-section, .results-section {
     background-color: white;
     border-radius: 10px;
-    padding: 20px;
-    margin-bottom: 20px;
+    padding: 15px;
+    margin-bottom: 15px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .input-section h2, .results-section h2 {
     color: #2196F3; /* Bleu */
-    margin-top: 0;
+    margin: 0 0 10px 0;
+    font-size: 1.5em;
 }
 
 .input-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.input-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 label {
     display: flex;
     align-items: center;
     color: #333;
+    flex: 1;
 }
 
 input, select {
-    margin-left: 10px;
+    margin-left: 5px;
     padding: 5px;
     border: 1px solid #2196F3; /* Bleu */
     border-radius: 5px;
+    width: 70px;
 }
 
-button {
-    margin-top: 20px;
-    padding: 10px 20px;
+button.increment {
+    padding: 5px 10px;
     background-color: #FFEB3B; /* Jaune */
     color: #333;
     border: none;
     border-radius: 5px;
     cursor: pointer;
+}
+
+button.increment:hover {
+    background-color: #FDD835;
+}
+
+button.reset {
+    margin-top: 15px;
+    padding: 10px;
+    background-color: #FFEB3B; /* Jaune */
+    color: #333;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
     font-weight: bold;
 }
 
-button:hover {
-    background-color: #FDD835; /* Jaune plus foncé */
+button.reset:hover {
+    background-color: #FDD835;
 }
 
 .results-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 .results-grid p {
@@ -76,9 +99,32 @@ button:hover {
     padding: 10px;
     background-color: #E8F5E9; /* Vert clair */
     border-radius: 5px;
+    font-size: 1em;
 }
 
 .results-grid span {
     font-weight: bold;
     color: #4CAF50; /* Vert */
+}
+
+/* Optimisation mobile */
+@media (max-width: 600px) {
+    header {
+        padding: 10px;
+    }
+    h1 {
+        font-size: 1.5em;
+    }
+    .input-section, .results-section {
+        padding: 10px;
+    }
+    .input-group {
+        flex-wrap: wrap;
+    }
+    input, select {
+        width: 60px;
+    }
+    button.increment {
+        padding: 5px;
+    }
 }

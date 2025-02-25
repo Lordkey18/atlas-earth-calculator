@@ -15,10 +15,22 @@
         <section class="input-section">
             <h2>Vos Parcelles</h2>
             <div class="input-grid">
-                <label>Commun : <input type="number" id="common" min="0" value="0"></label>
-                <label>Rare : <input type="number" id="rare" min="0" value="0"></label>
-                <label>Épique : <input type="number" id="epic" min="0" value="0"></label>
-                <label>Légendaire : <input type="number" id="legendary" min="0" value="0"></label>
+                <div class="input-group">
+                    <label>Commun : <input type="number" id="common" min="0" value="0"></label>
+                    <button class="increment" onclick="increment('common')">+1</button>
+                </div>
+                <div class="input-group">
+                    <label>Rare : <input type="number" id="rare" min="0" value="0"></label>
+                    <button class="increment" onclick="increment('rare')">+1</button>
+                </div>
+                <div class="input-group">
+                    <label>Épique : <input type="number" id="epic" min="0" value="0"></label>
+                    <button class="increment" onclick="increment('epic')">+1</button>
+                </div>
+                <div class="input-group">
+                    <label>Légendaire : <input type="number" id="legendary" min="0" value="0"></label>
+                    <button class="increment" onclick="increment('legendary')">+1</button>
+                </div>
                 <label>Boost : 
                     <select id="boost">
                         <option value="1">Aucun (x1)</option>
@@ -28,8 +40,9 @@
                         <option value="50">x50</option>
                     </select>
                 </label>
+                <label>Badges : <input type="number" id="badges" min="0" value="0"></label>
             </div>
-            <button onclick="resetData()">Réinitialiser</button>
+            <button class="reset" onclick="resetData()">Réinitialiser</button>
         </section>
         <section class="results-section">
             <h2>Vos Revenus</h2>
