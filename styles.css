@@ -6,10 +6,15 @@ body {
 }
 
 header {
-    background-color: #4CAF50; /* Vert */
-    color: white;
+    width: 100%;
     text-align: center;
-    padding: 15px;
+}
+
+.banner {
+    width: 100%;
+    max-width: 800px;
+    height: auto;
+    object-fit: contain;
 }
 
 main {
@@ -113,8 +118,12 @@ p {
 
 /* Optimisation mobile */
 @media (max-width: 600px) {
+    .banner {
+        max-width: 100%;
+        height: auto;
+    }
     header {
-        padding: 10px;
+        padding: 0;
     }
     h1 {
         font-size: 1.5em;
