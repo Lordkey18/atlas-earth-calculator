@@ -96,7 +96,7 @@ function calculateIncome() {
     // Afficher les boosts
     const badgePercent = ((getBadgeBoost(badges) - 1) * 100).toFixed(0);
     document.getElementById('badge-boost').textContent = `${badgePercent}%`;
-    document.getElementById('main-boost').textContent = `${mainBoost * 100}%`;
+    document.getElementById('main-boost').textContent = `x${mainBoost}`;
 
     // Sauvegarder les données
     const data = { common, rare, epic, legendary, boostType, badges };
