@@ -50,6 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
          targetAmountInput, targetAmountTerrainsInput, targetTimeInput, timeUnitSelect].forEach(element => {
             if (element) {
                 element.addEventListener('input', calculateAll);
+                element.addEventListener('change', calculateAll); // Ajout pour s'assurer que les changements via select ou input se déclenchent
             }
         });
 
@@ -285,19 +286,21 @@ function calculateForecasts() {
 
     // 2. Terrains nécessaires pour X € en X temps
     let targetSeconds = 0;
-    switch (timeUnit) {
-        case 'hours':
-            targetSeconds = targetTime * 3600; // Heures en secondes
-            break;
-        case 'days':
-            targetSeconds = targetTime * 86400; // Jours en secondes
-            break;
-        case 'months':
-            targetSeconds = targetTime * 2592000; // Mois en secondes (30 jours)
-            break;
-        case 'years':
-            targetSeconds = targetTime * 31536000; // Années en secondes (365 jours)
-            break;
+    if (targetTime > 0) {
+        switch (timeUnit) {
+            case 'hours':
+                targetSeconds = targetTime * 3600; // Heures en secondes
+                break;
+            case 'days':
+                targetSeconds = targetTime * 86400; // Jours en secondes
+                break;
+            case 'months':
+                targetSeconds = targetTime * 2592000; // Mois en secondes (30 jours)
+                break;
+            case 'years':
+                targetSeconds = targetTime * 31536000; // Années en secondes (365 jours)
+                break;
+        }
     }
 
     if (targetAmountTerrains > 0 && targetSeconds > 0 && totalPerSecond > 0) {
