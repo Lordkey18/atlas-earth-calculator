@@ -48,6 +48,9 @@ function openTab(tabName) {
         button.classList.remove('active');
     }
     document.querySelector(`.tab-button[onclick="openTab('${tabName}')"]`).classList.add('active');
+
+    // Forcer un recalcul après changement d'onglet
+    calculateAll();
 }
 
 // Calculer le boost des badges
