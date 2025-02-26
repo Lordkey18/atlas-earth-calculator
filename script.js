@@ -300,7 +300,7 @@ function calculateForecasts() {
             break;
     }
 
-    if (targetAmountTerrains > 0 && targetSeconds > 0) {
+    if (targetAmountTerrains > 0 && targetSeconds > 0 && totalPerSecond > 0) {
         const revenueNeededPerSecond = targetAmountTerrains / targetSeconds;
 
         // Calculer combien de terrains supplémentaires sont nécessaires
