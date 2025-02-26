@@ -57,7 +57,18 @@ document.addEventListener('DOMContentLoaded', () => {
         // Assurer que les onglets fonctionnent correctement dès le départ
         openTab('main-tab'); // Charger l'onglet principal par défaut
     } else {
-        console.error('Un ou plusieurs éléments HTML sont manquants.');
+        console.error('Un ou plusieurs éléments HTML sont manquants. IDs manquants :', {
+            common: !!document.getElementById('common'),
+            rare: !!document.getElementById('rare'),
+            epic: !!document.getElementById('epic'),
+            legendary: !!document.getElementById('legendary'),
+            boostType: !!document.getElementById('boost-type'),
+            badges: !!document.getElementById('badges'),
+            targetAmount: !!document.getElementById('target-amount'),
+            targetAmountTerrains: !!document.getElementById('target-amount-terrains'),
+            targetTime: !!document.getElementById('target-time'),
+            timeUnit: !!document.getElementById('time-unit')
+        });
     }
 });
 
@@ -326,13 +337,6 @@ function calculateForecasts() {
                 totalNewTerrains++;
                 additionalRevenueNeeded -= RATES.legendary;
             }
+            // Arrêter si on approche de zéro pour éviter des valeurs résiduelles très petites
+            if (additionalRevenueNeeded < 0.0000000001) break;
         }
-
-        // Afficher le résultat arrondi
-        const terrainsResultSpan = document.getElementById('terrains-result');
-        if (terrainsResultSpan) terrainsResultSpan.textContent = Math.max(0, Math.ceil(totalNewTerrains));
-    } else {
-        const terrainsResultSpan = document.getElementById('terrains-result');
-        if (terrainsResultSpan) terrainsResultSpan.textContent = '0';
-    }
-}
