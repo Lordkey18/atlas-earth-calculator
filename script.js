@@ -15,7 +15,7 @@ const RARITY = {
 };
 
 // Attendre que le DOM soit chargé pour exécuter le script
-window.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => {
     const savedData = JSON.parse(localStorage.getItem('atlasEarthData')) || {};
     const commonInput = document.getElementById('common');
     const rareInput = document.getElementById('rare');
@@ -307,3 +307,22 @@ function calculateForecasts() {
                 totalNewTerrains++;
                 additionalRevenueNeeded -= RATES.common;
             } else if (random < RARITY.common + RARITY.rare) {
+                totalNewTerrains++;
+                additionalRevenueNeeded -= RATES.rare;
+            } else if (random < RARITY.common + RARITY.rare + RARITY.epic) {
+                totalNewTerrains++;
+                additionalRevenueNeeded -= RATES.epic;
+            } else {
+                totalNewTerrains++;
+                additionalRevenueNeeded -= RATES.legendary;
+            }
+        }
+
+        // Afficher le résultat arrondi
+        const terrainsResultSpan = document.getElementById('terrains-result');
+        if (terrainsResultSpan) terrainsResultSpan.textContent = Math.max(0, Math.ceil(totalNewTerrains));
+    } else {
+        const terrainsResultSpan = document.getElementById('terrains-result');
+        if (terrainsResultSpan) terrainsResultSpan.textContent = '0';
+    }
+}
