@@ -23,13 +23,32 @@ window.onload = () => {
     document.getElementById('legendary').value = savedData.legendary || 0;
     document.getElementById('boost-type').value = savedData.boostType || 'inactive';
     document.getElementById('badges').value = savedData.badges || 0;
-    calculateIncome();
+    document.getElementById('target-amount').value = savedData.targetAmount || 0;
+    document.getElementById('target-amount-terrains').value = savedData.targetAmountTerrains || 0;
+    document.getElementById('target-time').value = savedData.targetTime || 0;
+    document.getElementById('time-unit').value = savedData.timeUnit || 'hours';
+    calculateAll();
 
-    // Recalcul en temps réel
+    // Recalcul en temps réel pour toutes les sections
     document.querySelectorAll('input, select').forEach(element => {
-        element.addEventListener('input', calculateIncome);
+        element.addEventListener('input', calculateAll);
     });
 };
+
+// Fonction pour gérer les onglets
+function openTab(tabName) {
+    const tabs = document.getElementsByClassName('tab-content');
+    for (let tab of tabs) {
+        tab.classList.remove('active');
+    }
+    document.getElementById(tabName + '-tab').classList.add('active');
+
+    const buttons = document.getElementsByClassName('tab-button');
+    for (let button of buttons) {
+        button.classList.remove('active');
+    }
+    document.querySelector(`.tab-button[onclick="openTab('${tabName}')"]`).classList.add('active');
+}
 
 // Calculer le boost des badges
 function getBadgeBoost(badges) {
@@ -53,6 +72,12 @@ function getDailyBoost(totalParcels) {
     if (totalParcels >= 71) return 15;
     if (totalParcels >= 1) return 20;
     return 1;
+}
+
+// Calculer tous les éléments (revenus et prévisions)
+function calculateAll() {
+    calculateIncome();
+    calculateForecasts();
 }
 
 // Calculer les revenus actuels
@@ -107,7 +132,7 @@ function calculateIncome() {
     document.getElementById('main-boost').textContent = `x${mainBoost}`;
 
     // Sauvegarder les données
-    const data = { common, rare, epic, legendary, boostType, badges };
+    const data = { common, rare, epic, legendary, boostType, badges, targetAmount: document.getElementById('target-amount').value, targetAmountTerrains: document.getElementById('target-amount-terrains').value, targetTime: document.getElementById('target-time').value, timeUnit: document.getElementById('time-unit').value };
     localStorage.setItem('atlasEarthData', JSON.stringify(data));
 }
 
@@ -115,7 +140,7 @@ function calculateIncome() {
 function increment(type) {
     const input = document.getElementById(type);
     input.value = (parseInt(input.value) || 0) + 1;
-    calculateIncome();
+    calculateAll();
 }
 
 // Réinitialiser les données
@@ -130,11 +155,11 @@ function resetData() {
     document.getElementById('target-amount').value = 0;
     document.getElementById('target-amount-terrains').value = 0;
     document.getElementById('target-time').value = 0;
-    calculateIncome();
-    calculateForecasts();
+    document.getElementById('time-unit').value = 'hours';
+    calculateAll();
 }
 
-// Calculer les prévisions
+// Calculer les prévisions (automatique)
 function calculateForecasts() {
     const common = parseInt(document.getElementById('common').value) || 0;
     const rare = parseInt(document.getElementById('rare').value) || 0;
@@ -160,7 +185,7 @@ function calculateForecasts() {
     }
     const totalPerSecond = basePerSecond * badgeBoost * mainBoost;
 
-    // 1. Temps pour gagner X €
+    // 1. Temps pour gagner X € (avec vos données actuelles)
     const targetAmount = parseFloat(document.getElementById('target-amount').value) || 0;
     if (targetAmount > 0 && totalPerSecond > 0) {
         const secondsNeeded = targetAmount / totalPerSecond;
@@ -183,9 +208,26 @@ function calculateForecasts() {
 
     // 2. Terrains nécessaires pour X € en X temps
     const targetAmountTerrains = parseFloat(document.getElementById('target-amount-terrains').value) || 0;
-    const targetTimeHours = parseFloat(document.getElementById('target-time').value) || 0;
-    if (targetAmountTerrains > 0 && targetTimeHours > 0) {
-        const targetSeconds = targetTimeHours * 3600;
+    const targetTime = parseFloat(document.getElementById('target-time').value) || 0;
+    const timeUnit = document.getElementById('time-unit').value;
+
+    let targetSeconds = 0;
+    switch (timeUnit) {
+        case 'hours':
+            targetSeconds = targetTime * 3600; // Heures en secondes
+            break;
+        case 'days':
+            targetSeconds = targetTime * 86400; // Jours en secondes
+            break;
+        case 'months':
+            targetSeconds = targetTime * 2592000; // Mois en secondes (30 jours)
+            break;
+        case 'years':
+            targetSeconds = targetTime * 31536000; // Années en secondes (365 jours)
+            break;
+    }
+
+    if (targetAmountTerrains > 0 && targetSeconds > 0) {
         const revenueNeededPerSecond = targetAmountTerrains / targetSeconds;
 
         // Calculer combien de terrains supplémentaires sont nécessaires

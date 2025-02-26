@@ -23,6 +23,36 @@ main {
     padding: 0 10px;
 }
 
+.tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.tab-button {
+    padding: 10px 20px;
+    background-color: #FFEB3B; /* Jaune */
+    color: #333;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    border-bottom: 2px solid transparent;
+}
+
+.tab-button.active {
+    border-bottom: 2px solid #4CAF50; /* Vert */
+    background-color: #FDD835;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
 .input-section, .results-section, .forecast-section {
     background-color: white;
     border-radius: 10px;
@@ -77,22 +107,6 @@ button.increment:hover {
     background-color: #FDD835;
 }
 
-button.reset, button.calculate {
-    margin-top: 15px;
-    padding: 10px;
-    background-color: #FFEB3B; /* Jaune */
-    color: #333;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    width: 100%;
-    font-weight: bold;
-}
-
-button.reset:hover, button.calculate:hover {
-    background-color: #FDD835;
-}
-
 .results-grid {
     display: flex;
     flex-direction: column;
@@ -133,6 +147,14 @@ h3 {
     }
     h1 {
         font-size: 1.5em;
+    }
+    .tabs {
+        flex-direction: column;
+        gap: 5px;
+    }
+    .tab-button {
+        width: 100%;
+        padding: 8px;
     }
     .input-section, .results-section, .forecast-section {
         padding: 10px;
