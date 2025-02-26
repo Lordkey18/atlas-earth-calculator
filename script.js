@@ -14,7 +14,7 @@ const RARITY = {
     legendary: 0.05 // 5%
 };
 
-// Charger les données sauvegardées au démarrage
+// Charger et initialiser les données sauvegardées au démarrage
 window.onload = () => {
     const savedData = JSON.parse(localStorage.getItem('atlasEarthData')) || {};
     document.getElementById('common').value = savedData.common || 0;
@@ -27,12 +27,17 @@ window.onload = () => {
     document.getElementById('target-amount-terrains').value = savedData.targetAmountTerrains || 0;
     document.getElementById('target-time').value = savedData.targetTime || 0;
     document.getElementById('time-unit').value = savedData.timeUnit || 'hours';
+
+    // Forcer un recalcul initial pour tous les champs
     calculateAll();
 
-    // Recalcul en temps réel pour toutes les sections
+    // Ajouter les écouteurs d'événements pour recalculer à chaque changement
     document.querySelectorAll('input, select').forEach(element => {
         element.addEventListener('input', calculateAll);
     });
+
+    // Assurer que les onglets fonctionnent correctement dès le départ
+    openTab('main-tab'); // Charger l'onglet principal par défaut
 };
 
 // Fonction pour gérer les onglets
@@ -41,7 +46,7 @@ function openTab(tabName) {
     for (let tab of tabs) {
         tab.classList.remove('active');
     }
-    document.getElementById(tabName + '-tab').classList.add('active');
+    document.getElementById(tabName).classList.add('active');
 
     const buttons = document.getElementsByClassName('tab-button');
     for (let button of buttons) {
@@ -55,16 +60,17 @@ function openTab(tabName) {
 
 // Calculer le boost des badges
 function getBadgeBoost(badges) {
+    if (!badges || isNaN(badges) || badges < 1) return 1; // 0% si pas de badges ou valeur invalide
     if (badges >= 101) return 1.25; // 25%
     if (badges >= 61) return 1.20;  // 20%
     if (badges >= 31) return 1.15;  // 15%
     if (badges >= 11) return 1.10;  // 10%
-    if (badges >= 1) return 1.05;   // 5%
-    return 1;                       // 0%
+    return 1.05;                    // 5%
 }
 
 // Calculer le boost journalier basé sur le nombre total de terrains
 function getDailyBoost(totalParcels) {
+    if (!totalParcels || isNaN(totalParcels) || totalParcels < 1) return 1;
     if (totalParcels >= 401) return 2;
     if (totalParcels >= 351) return 3;
     if (totalParcels >= 301) return 4;
@@ -73,14 +79,17 @@ function getDailyBoost(totalParcels) {
     if (totalParcels >= 136) return 8;
     if (totalParcels >= 101) return 10;
     if (totalParcels >= 71) return 15;
-    if (totalParcels >= 1) return 20;
-    return 1;
+    return 20;
 }
 
 // Calculer tous les éléments (revenus et prévisions)
 function calculateAll() {
-    calculateIncome();
-    calculateForecasts();
+    try {
+        calculateIncome();
+        calculateForecasts();
+    } catch (error) {
+        console.error('Erreur dans calculateAll:', error);
+    }
 }
 
 // Calculer les revenus actuels
@@ -96,20 +105,18 @@ function calculateIncome() {
     const totalParcels = common + rare + epic + legendary;
 
     // Revenu total par seconde sans boost
-    const basePerSecond = common * RATES.common + rare * RATES.rare + 
-                         epic * RATES.epic + legendary * RATES.legendary;
+    const basePerSecond = (common * RATES.common + rare * RATES.rare + 
+                          epic * RATES.epic + legendary * RATES.legendary) || 0;
     
     // Appliquer le boost des badges d'abord
     const badgeBoostedPerSecond = basePerSecond * getBadgeBoost(badges);
 
     // Déterminer le boost principal
-    let mainBoost;
+    let mainBoost = 1;
     if (boostType === 'super') {
         mainBoost = 50; // Super Rent
     } else if (boostType === 'daily') {
         mainBoost = getDailyBoost(totalParcels);
-    } else {
-        mainBoost = 1; // Inactif
     }
 
     // Appliquer le boost principal
@@ -122,12 +129,12 @@ function calculateIncome() {
     const monthly = totalPerSecond * 2592000;
     const yearly = totalPerSecond * 31536000;
 
-    // Afficher les résultats
-    document.getElementById('hourly').textContent = `$${hourly.toFixed(6)}`;
-    document.getElementById('daily').textContent = `$${daily.toFixed(6)}`;
-    document.getElementById('weekly').textContent = `$${weekly.toFixed(6)}`;
-    document.getElementById('monthly').textContent = `$${monthly.toFixed(6)}`;
-    document.getElementById('yearly').textContent = `$${yearly.toFixed(6)}`;
+    // Afficher les résultats, avec une gestion des valeurs nulles ou négatives
+    document.getElementById('hourly').textContent = `$${hourly.toFixed(6) || '0.000000'}`;
+    document.getElementById('daily').textContent = `$${daily.toFixed(6) || '0.000000'}`;
+    document.getElementById('weekly').textContent = `$${weekly.toFixed(6) || '0.000000'}`;
+    document.getElementById('monthly').textContent = `$${monthly.toFixed(6) || '0.000000'}`;
+    document.getElementById('yearly').textContent = `$${yearly.toFixed(6) || '0.000000'}`;
 
     // Afficher les boosts
     const badgePercent = ((getBadgeBoost(badges) - 1) * 100).toFixed(0);
@@ -135,7 +142,14 @@ function calculateIncome() {
     document.getElementById('main-boost').textContent = `x${mainBoost}`;
 
     // Sauvegarder les données
-    const data = { common, rare, epic, legendary, boostType, badges, targetAmount: document.getElementById('target-amount').value, targetAmountTerrains: document.getElementById('target-amount-terrains').value, targetTime: document.getElementById('target-time').value, timeUnit: document.getElementById('time-unit').value };
+    const data = { 
+        common, rare, epic, legendary, 
+        boostType, badges, 
+        targetAmount: document.getElementById('target-amount').value, 
+        targetAmountTerrains: document.getElementById('target-amount-terrains').value, 
+        targetTime: document.getElementById('target-time').value, 
+        timeUnit: document.getElementById('time-unit').value 
+    };
     localStorage.setItem('atlasEarthData', JSON.stringify(data));
 }
 
@@ -175,17 +189,16 @@ function calculateForecasts() {
     const totalParcels = common + rare + epic + legendary;
 
     // Revenu total par seconde (comme dans calculateIncome)
-    const basePerSecond = common * RATES.common + rare * RATES.rare + 
-                         epic * RATES.epic + legendary * RATES.legendary;
+    const basePerSecond = (common * RATES.common + rare * RATES.rare + 
+                          epic * RATES.epic + legendary * RATES.legendary) || 0;
     const badgeBoost = getBadgeBoost(badges);
-    let mainBoost;
+    let mainBoost = 1;
     if (boostType === 'super') {
         mainBoost = 50; // Super Rent
     } else if (boostType === 'daily') {
         mainBoost = getDailyBoost(totalParcels);
-    } else {
-        mainBoost = 1; // Inactif
     }
+
     const totalPerSecond = basePerSecond * badgeBoost * mainBoost;
 
     // 1. Temps pour gagner X € (avec vos données actuelles)
@@ -238,7 +251,7 @@ function calculateForecasts() {
         let totalNewTerrains = 0;
 
         // Distribuer les nouveaux terrains selon les pourcentages de rareté
-        while (additionalRevenueNeeded > 0) {
+        while (additionalRevenueNeeded > 0 && totalNewTerrains < 1000000) { // Limite pour éviter une boucle infinie
             const random = Math.random();
             if (random < RARITY.common) {
                 totalNewTerrains++;
@@ -253,8 +266,6 @@ function calculateForecasts() {
                 totalNewTerrains++;
                 additionalRevenueNeeded -= RATES.legendary;
             }
-            // Arrêter si on dépasse ou si on approche zéro
-            if (totalNewTerrains > 1000000) break; // Limite pour éviter une boucle infinie
         }
 
         // Afficher le résultat arrondi
