@@ -54,6 +54,20 @@
             </div>
             <button class="reset" onclick="resetData()">Réinitialiser</button>
         </section>
+        <section class="input-section forecast-section">
+            <h2>Prévision</h2>
+            <div class="input-grid">
+                <h3>Temps pour gagner X €</h3>
+                <label>Montant (€) : <input type="number" id="target-amount" min="0" value="0" step="0.01"></label>
+                <p>Temps estimé : <span id="time-result">0 secondes</span></p>
+
+                <h3>Terrains nécessaires pour X € en X temps</h3>
+                <label>Montant (€) : <input type="number" id="target-amount-terrains" min="0" value="0" step="0.01"></label>
+                <label>Temps (heures) : <input type="number" id="target-time" min="0" value="0" step="1"></label>
+                <p>Terrains estimés : <span id="terrains-result">0</span></p>
+            </div>
+            <button class="calculate" onclick="calculateForecasts()">Calculer Prévisions</button>
+        </section>
         <section class="results-section">
             <h2>Vos Revenus</h2>
             <div class="results-grid">

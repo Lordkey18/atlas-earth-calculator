@@ -6,6 +6,14 @@ const RATES = {
     legendary: 0.0000000044
 };
 
+// Pourcentages de rareté des terrains
+const RARITY = {
+    common: 0.50,   // 50%
+    rare: 0.30,     // 30%
+    epic: 0.15,     // 15%
+    legendary: 0.05 // 5%
+};
+
 // Charger les données sauvegardées au démarrage
 window.onload = () => {
     const savedData = JSON.parse(localStorage.getItem('atlasEarthData')) || {};
@@ -47,7 +55,7 @@ function getDailyBoost(totalParcels) {
     return 1;
 }
 
-// Calculer les revenus
+// Calculer les revenus actuels
 function calculateIncome() {
     const common = parseInt(document.getElementById('common').value) || 0;
     const rare = parseInt(document.getElementById('rare').value) || 0;
@@ -119,5 +127,94 @@ function resetData() {
     document.getElementById('legendary').value = 0;
     document.getElementById('boost-type').value = 'inactive';
     document.getElementById('badges').value = 0;
+    document.getElementById('target-amount').value = 0;
+    document.getElementById('target-amount-terrains').value = 0;
+    document.getElementById('target-time').value = 0;
     calculateIncome();
+    calculateForecasts();
+}
+
+// Calculer les prévisions
+function calculateForecasts() {
+    const common = parseInt(document.getElementById('common').value) || 0;
+    const rare = parseInt(document.getElementById('rare').value) || 0;
+    const epic = parseInt(document.getElementById('epic').value) || 0;
+    const legendary = parseInt(document.getElementById('legendary').value) || 0;
+    const boostType = document.getElementById('boost-type').value;
+    const badges = parseInt(document.getElementById('badges').value) || 0;
+
+    // Total des parcelles actuelles
+    const totalParcels = common + rare + epic + legendary;
+
+    // Revenu total par seconde (comme dans calculateIncome)
+    const basePerSecond = common * RATES.common + rare * RATES.rare + 
+                         epic * RATES.epic + legendary * RATES.legendary;
+    const badgeBoost = getBadgeBoost(badges);
+    let mainBoost;
+    if (boostType === 'super') {
+        mainBoost = 50; // Super Rent
+    } else if (boostType === 'daily') {
+        mainBoost = getDailyBoost(totalParcels);
+    } else {
+        mainBoost = 1; // Inactif
+    }
+    const totalPerSecond = basePerSecond * badgeBoost * mainBoost;
+
+    // 1. Temps pour gagner X €
+    const targetAmount = parseFloat(document.getElementById('target-amount').value) || 0;
+    if (targetAmount > 0 && totalPerSecond > 0) {
+        const secondsNeeded = targetAmount / totalPerSecond;
+        let timeResult = '';
+        if (secondsNeeded < 60) {
+            timeResult = `${secondsNeeded.toFixed(2)} secondes`;
+        } else if (secondsNeeded < 3600) {
+            timeResult = `${(secondsNeeded / 60).toFixed(2)} minutes`;
+        } else if (secondsNeeded < 86400) {
+            timeResult = `${(secondsNeeded / 3600).toFixed(2)} heures`;
+        } else if (secondsNeeded < 2592000) {
+            timeResult = `${(secondsNeeded / 86400).toFixed(2)} jours`;
+        } else {
+            timeResult = `${(secondsNeeded / 2592000).toFixed(2)} mois`;
+        }
+        document.getElementById('time-result').textContent = timeResult;
+    } else {
+        document.getElementById('time-result').textContent = '0 secondes';
+    }
+
+    // 2. Terrains nécessaires pour X € en X temps
+    const targetAmountTerrains = parseFloat(document.getElementById('target-amount-terrains').value) || 0;
+    const targetTimeHours = parseFloat(document.getElementById('target-time').value) || 0;
+    if (targetAmountTerrains > 0 && targetTimeHours > 0) {
+        const targetSeconds = targetTimeHours * 3600;
+        const revenueNeededPerSecond = targetAmountTerrains / targetSeconds;
+
+        // Calculer combien de terrains supplémentaires sont nécessaires
+        let additionalRevenueNeeded = revenueNeededPerSecond / (badgeBoost * mainBoost);
+        let totalNewTerrains = 0;
+
+        // Distribuer les nouveaux terrains selon les pourcentages de rareté
+        while (additionalRevenueNeeded > 0) {
+            const random = Math.random();
+            if (random < RARITY.common) {
+                totalNewTerrains++;
+                additionalRevenueNeeded -= RATES.common;
+            } else if (random < RARITY.common + RARITY.rare) {
+                totalNewTerrains++;
+                additionalRevenueNeeded -= RATES.rare;
+            } else if (random < RARITY.common + RARITY.rare + RARITY.epic) {
+                totalNewTerrains++;
+                additionalRevenueNeeded -= RATES.epic;
+            } else {
+                totalNewTerrains++;
+                additionalRevenueNeeded -= RATES.legendary;
+            }
+            // Arrêter si on dépasse ou si on approche zéro
+            if (totalNewTerrains > 1000000) break; // Limite pour éviter une boucle infinie
+        }
+
+        // Afficher le résultat arrondi
+        document.getElementById('terrains-result').textContent = Math.max(0, Math.ceil(totalNewTerrains));
+    } else {
+        document.getElementById('terrains-result').textContent = '0';
+    }
 }
