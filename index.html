@@ -9,76 +9,70 @@
 </head>
 <body>
     <header>
-        <img src="banner.jpg" alt="Atlas Earth Calculator" class="banner">
+        <h1>Atlas Earth Calculator</h1>
     </header>
     <main>
-        <div class="tabs">
-            <button class="tab-button active" onclick="openTab('main-tab')">Principal</button>
-            <button class="tab-button" onclick="openTab('forecast-tab')">Prévision</button>
-        </div>
-
-        <div id="main-tab" class="tab-content active">
-            <section class="input-section">
-                <h2>Vos Parcelles</h2>
-                <div class="input-grid">
-                    <div class="input-group">
-                        <label>Commun : <input type="number" id="common" min="0" value="0"></label>
-                        <button class="increment" onclick="increment('common')">+1</button>
-                    </div>
-                    <div class="input-group">
-                        <label>Rare : <input type="number" id="rare" min="0" value="0"></label>
-                        <button class="increment" onclick="increment('rare')">+1</button>
-                    </div>
-                    <div class="input-group">
-                        <label>Épique : <input type="number" id="epic" min="0" value="0"></label>
-                        <button class="increment" onclick="increment('epic')">+1</button>
-                    </div>
-                    <div class="input-group">
-                        <label>Légendaire : <input type="number" id="legendary" min="0" value="0"></label>
-                        <button class="increment" onclick="increment('legendary')">+1</button>
-                    </div>
+        <section class="input-section">
+            <h2>Vos Parcelles</h2>
+            <div class="input-grid">
+                <div class="input-group">
+                    <label>Commun : <input type="number" id="common" min="0" value="0"></label>
+                    <button class="increment" onclick="increment('common')">+1</button>
                 </div>
-            </section>
-            <section class="input-section">
-                <h2>Vos Badges</h2>
-                <div class="input-grid">
-                    <label>Nombre : <input type="number" id="badges" min="0" value="0"></label>
-                    <p>Boost badges : <span id="badge-boost">0%</span></p>
+                <div class="input-group">
+                    <label>Rare : <input type="number" id="rare" min="0" value="0"></label>
+                    <button class="increment" onclick="increment('rare')">+1</button>
                 </div>
-            </section>
-            <section class="input-section">
-                <h2>Votre Boost</h2>
-                <div class="input-grid">
-                    <label>Type : 
-                        <select id="boost-type">
-                            <option value="inactive">Inactif</option>
-                            <option value="daily">Boost journalier actif</option>
-                            <option value="super">Super Rent (x50)</option>
-                        </select>
-                    </label>
-                    <p>Boost actif : <span id="main-boost">x1</span></p>
+                <div class="input-group">
+                    <label>Épique : <input type="number" id="epic" min="0" value="0"></label>
+                    <button class="increment" onclick="increment('epic')">+1</button>
                 </div>
-            </section>
-            <section class="results-section">
-                <h2>Vos Revenus</h2>
-                <div class="results-grid">
-                    <p>Heure : <span id="hourly">$0</span></p>
-                    <p>Jour : <span id="daily">$0</span></p>
-                    <p>Semaine : <span id="weekly">$0</span></p>
-                    <p>Mois : <span id="monthly">$0</span></p>
-                    <p>Année : <span id="yearly">$0</span></p>
+                <div class="input-group">
+                    <label>Légendaire : <input type="number" id="legendary" min="0" value="0"></label>
+                    <button class="increment" onclick="increment('legendary')">+1</button>
                 </div>
-            </section>
-        </div>
-
-        <div id="forecast-tab" class="tab-content">
-            <section class="input-section forecast-section">
-                <h2>Prévision</h2>
-                <div class="input-grid">
+            </div>
+        </section>
+        <section class="input-section">
+            <h2>Vos Badges</h2>
+            <div class="input-grid">
+                <label>Nombre : <input type="number" id="badges" min="0" value="0"></label>
+                <p>Boost badges : <span id="badge-boost">0%</span></p>
+            </div>
+        </section>
+        <section class="input-section">
+            <h2>Votre Boost</h2>
+            <div class="input-grid">
+                <label>Type : 
+                    <select id="boost-type">
+                        <option value="inactive">Inactif</option>
+                        <option value="daily">Actif</option>
+                        <option value="super">Super Rent</option>
+                    </select>
+                </label>
+                <p>Boost actif : <span id="main-boost">x1</span></p>
+            </div>
+            <button class="reset" onclick="resetData()">Réinitialiser</button>
+        </section>
+        <section class="results-section">
+            <h2>Vos Revenus</h2>
+            <div class="results-grid">
+                <p>Heure : <span id="hourly">$0</span></p>
+                <p>Jour : <span id="daily">$0</span></p>
+                <p>Semaine : <span id="weekly">$0</span></p>
+                <p>Mois : <span id="monthly">$0</span></p>
+                <p>Année : <span id="yearly">$0</span></p>
+            </div>
+        </section>
+        <section class="input-section forecast-section">
+            <h2>Prévision</h2>
+            <div class="input-grid">
+                <section class="forecast-subsection">
                     <h3>Temps pour gagner X € (avec vos données actuelles)</h3>
                     <label>Montant (€) : <input type="number" id="target-amount" min="0" value="0" step="0.01"></label>
                     <p>Temps estimé : <span id="time-result">0 secondes</span></p>
-
+                </section>
+                <section class="forecast-subsection">
                     <h3>Terrains nécessaires pour X € en X temps</h3>
                     <label>Montant (€) : <input type="number" id="target-amount-terrains" min="0" value="0" step="0.01"></label>
                     <label>Temps : 
@@ -90,9 +84,9 @@
                         </select>
                     </label>
                     <p>Terrains estimés : <span id="terrains-result">0</span></p>
-                </div>
-            </section>
-        </div>
+                </section>
+            </div>
+        </section>
     </main>
     <script src="script.js"></script>
 </body>

@@ -46,16 +46,24 @@ document.addEventListener('DOMContentLoaded', () => {
         calculateAll();
 
         // Ajouter les écouteurs d'événements pour recalculer à chaque changement
-        [commonInput, rareInput, epicInput, legendaryInput, boostTypeSelect, badgesInput, 
-         targetAmountInput, targetAmountTerrainsInput, targetTimeInput, timeUnitSelect].forEach(element => {
-            if (element) {
-                element.addEventListener('input', calculateAll);
-                element.addEventListener('change', calculateAll); // Ajout pour s'assurer que les changements via select ou input se déclenchent
+        const inputs = [commonInput, rareInput, epicInput, legendaryInput, badgesInput, 
+                       targetAmountInput, targetAmountTerrainsInput, targetTimeInput];
+        const selects = [boostTypeSelect, timeUnitSelect];
+
+        inputs.forEach(input => {
+            if (input) {
+                input.addEventListener('input', calculateAll);
+                input.addEventListener('change', calculateAll); // Pour les modifications manuelles
+                input.addEventListener('blur', calculateAll);    // Pour s'assurer que la mise à jour se fait quand l'utilisateur quitte le champ
             }
         });
 
-        // Assurer que les onglets fonctionnent correctement dès le départ
-        openTab('main-tab'); // Charger l'onglet principal par défaut
+        selects.forEach(select => {
+            if (select) {
+                select.addEventListener('change', calculateAll); // Pour les menus déroulants
+                select.addEventListener('input', calculateAll);  // Pour les cas de modification manuelle (rare, mais utile)
+            }
+        });
     } else {
         console.error('Un ou plusieurs éléments HTML sont manquants. IDs manquants :', {
             common: !!document.getElementById('common'),
@@ -71,34 +79,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
-
-// Fonction pour gérer les onglets
-function openTab(tabName) {
-    const tabs = document.getElementsByClassName('tab-content');
-    for (let tab of tabs) {
-        tab.classList.remove('active');
-    }
-    const activeTab = document.getElementById(tabName);
-    if (activeTab) {
-        activeTab.classList.add('active');
-    } else {
-        console.error(`Onglet ${tabName} non trouvé.`);
-    }
-
-    const buttons = document.getElementsByClassName('tab-button');
-    for (let button of buttons) {
-        button.classList.remove('active');
-    }
-    const activeButton = document.querySelector(`.tab-button[onclick="openTab('${tabName}')"]`);
-    if (activeButton) {
-        activeButton.classList.add('active');
-    } else {
-        console.error(`Bouton pour onglet ${tabName} non trouvé.`);
-    }
-
-    // Forcer un recalcul après changement d'onglet
-    calculateAll();
-}
 
 // Calculer le boost des badges
 function getBadgeBoost(badges) {
@@ -206,45 +186,6 @@ function calculateIncome() {
     localStorage.setItem('atlasEarthData', JSON.stringify(data));
 }
 
-// Incrémenter une parcelle
-function increment(type) {
-    const input = document.getElementById(type);
-    if (input) {
-        input.value = (parseInt(input.value) || 0) + 1;
-        calculateAll();
-    }
-}
-
-// Réinitialiser les données
-function resetData() {
-    const commonInput = document.getElementById('common');
-    const rareInput = document.getElementById('rare');
-    const epicInput = document.getElementById('epic');
-    const legendaryInput = document.getElementById('legendary');
-    const boostTypeSelect = document.getElementById('boost-type');
-    const badgesInput = document.getElementById('badges');
-    const targetAmountInput = document.getElementById('target-amount');
-    const targetAmountTerrainsInput = document.getElementById('target-amount-terrains');
-    const targetTimeInput = document.getElementById('target-time');
-    const timeUnitSelect = document.getElementById('time-unit');
-
-    if (commonInput && rareInput && epicInput && legendaryInput && boostTypeSelect && badgesInput && 
-        targetAmountInput && targetAmountTerrainsInput && targetTimeInput && timeUnitSelect) {
-        commonInput.value = 0;
-        rareInput.value = 0;
-        epicInput.value = 0;
-        legendaryInput.value = 0;
-        boostTypeSelect.value = 'inactive';
-        badgesInput.value = 0;
-        targetAmountInput.value = 0;
-        targetAmountTerrainsInput.value = 0;
-        targetTimeInput.value = 0;
-        timeUnitSelect.value = 'hours';
-        localStorage.removeItem('atlasEarthData');
-        calculateAll();
-    }
-}
-
 // Calculer les prévisions (automatique)
 function calculateForecasts() {
     const common = parseInt(document.getElementById('common')?.value) || 0;
@@ -253,10 +194,6 @@ function calculateForecasts() {
     const legendary = parseInt(document.getElementById('legendary')?.value) || 0;
     const boostType = document.getElementById('boost-type')?.value || 'inactive';
     const badges = parseInt(document.getElementById('badges')?.value) || 0;
-    const targetAmount = parseFloat(document.getElementById('target-amount')?.value) || 0;
-    const targetAmountTerrains = parseFloat(document.getElementById('target-amount-terrains')?.value) || 0;
-    const targetTime = parseFloat(document.getElementById('target-time')?.value) || 0;
-    const timeUnit = document.getElementById('time-unit')?.value || 'hours';
 
     // Total des parcelles actuelles
     const totalParcels = common + rare + epic + legendary;
@@ -274,6 +211,7 @@ function calculateForecasts() {
     const totalPerSecond = basePerSecond * badgeBoost * mainBoost;
 
     // 1. Temps pour gagner X € (avec vos données actuelles)
+    const targetAmount = parseFloat(document.getElementById('target-amount')?.value) || 0;
     if (targetAmount > 0 && totalPerSecond > 0) {
         const secondsNeeded = targetAmount / totalPerSecond;
         let timeResult = '';
@@ -296,6 +234,10 @@ function calculateForecasts() {
     }
 
     // 2. Terrains nécessaires pour X € en X temps
+    const targetAmountTerrains = parseFloat(document.getElementById('target-amount-terrains')?.value) || 0;
+    const targetTime = parseFloat(document.getElementById('target-time')?.value) || 0;
+    const timeUnit = document.getElementById('time-unit')?.value || 'hours';
+
     let targetSeconds = 0;
     if (targetTime > 0) {
         switch (timeUnit) {
@@ -347,5 +289,44 @@ function calculateForecasts() {
     } else {
         const terrainsResultSpan = document.getElementById('terrains-result');
         if (terrainsResultSpan) terrainsResultSpan.textContent = '0';
+    }
+}
+
+// Incrémenter une parcelle
+function increment(type) {
+    const input = document.getElementById(type);
+    if (input) {
+        input.value = (parseInt(input.value) || 0) + 1;
+        calculateAll();
+    }
+}
+
+// Réinitialiser les données
+function resetData() {
+    const commonInput = document.getElementById('common');
+    const rareInput = document.getElementById('rare');
+    const epicInput = document.getElementById('epic');
+    const legendaryInput = document.getElementById('legendary');
+    const boostTypeSelect = document.getElementById('boost-type');
+    const badgesInput = document.getElementById('badges');
+    const targetAmountInput = document.getElementById('target-amount');
+    const targetAmountTerrainsInput = document.getElementById('target-amount-terrains');
+    const targetTimeInput = document.getElementById('target-time');
+    const timeUnitSelect = document.getElementById('time-unit');
+
+    if (commonInput && rareInput && epicInput && legendaryInput && boostTypeSelect && badgesInput && 
+        targetAmountInput && targetAmountTerrainsInput && targetTimeInput && timeUnitSelect) {
+        commonInput.value = 0;
+        rareInput.value = 0;
+        epicInput.value = 0;
+        legendaryInput.value = 0;
+        boostTypeSelect.value = 'inactive';
+        badgesInput.value = 0;
+        targetAmountInput.value = 0;
+        targetAmountTerrainsInput.value = 0;
+        targetTimeInput.value = 0;
+        timeUnitSelect.value = 'hours';
+        localStorage.removeItem('atlasEarthData');
+        calculateAll();
     }
 }
