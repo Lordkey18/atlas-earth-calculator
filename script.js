@@ -14,31 +14,51 @@ const RARITY = {
     legendary: 0.05 // 5%
 };
 
-// Charger et initialiser les données sauvegardées au démarrage
-window.onload = () => {
+// Attendre que le DOM soit chargé pour exécuter le script
+window.addEventListener('DOMContentLoaded', () => {
     const savedData = JSON.parse(localStorage.getItem('atlasEarthData')) || {};
-    document.getElementById('common').value = savedData.common || 0;
-    document.getElementById('rare').value = savedData.rare || 0;
-    document.getElementById('epic').value = savedData.epic || 0;
-    document.getElementById('legendary').value = savedData.legendary || 0;
-    document.getElementById('boost-type').value = savedData.boostType || 'inactive';
-    document.getElementById('badges').value = savedData.badges || 0;
-    document.getElementById('target-amount').value = savedData.targetAmount || 0;
-    document.getElementById('target-amount-terrains').value = savedData.targetAmountTerrains || 0;
-    document.getElementById('target-time').value = savedData.targetTime || 0;
-    document.getElementById('time-unit').value = savedData.timeUnit || 'hours';
+    const commonInput = document.getElementById('common');
+    const rareInput = document.getElementById('rare');
+    const epicInput = document.getElementById('epic');
+    const legendaryInput = document.getElementById('legendary');
+    const boostTypeSelect = document.getElementById('boost-type');
+    const badgesInput = document.getElementById('badges');
+    const targetAmountInput = document.getElementById('target-amount');
+    const targetAmountTerrainsInput = document.getElementById('target-amount-terrains');
+    const targetTimeInput = document.getElementById('target-time');
+    const timeUnitSelect = document.getElementById('time-unit');
 
-    // Forcer un recalcul initial pour tous les champs
-    calculateAll();
+    // Vérifier que les éléments existent avant de les manipuler
+    if (commonInput && rareInput && epicInput && legendaryInput && boostTypeSelect && badgesInput && 
+        targetAmountInput && targetAmountTerrainsInput && targetTimeInput && timeUnitSelect) {
+        commonInput.value = savedData.common || 0;
+        rareInput.value = savedData.rare || 0;
+        epicInput.value = savedData.epic || 0;
+        legendaryInput.value = savedData.legendary || 0;
+        boostTypeSelect.value = savedData.boostType || 'inactive';
+        badgesInput.value = savedData.badges || 0;
+        targetAmountInput.value = savedData.targetAmount || 0;
+        targetAmountTerrainsInput.value = savedData.targetAmountTerrains || 0;
+        targetTimeInput.value = savedData.targetTime || 0;
+        timeUnitSelect.value = savedData.timeUnit || 'hours';
 
-    // Ajouter les écouteurs d'événements pour recalculer à chaque changement
-    document.querySelectorAll('input, select').forEach(element => {
-        element.addEventListener('input', calculateAll);
-    });
+        // Forcer un recalcul initial pour tous les champs
+        calculateAll();
 
-    // Assurer que les onglets fonctionnent correctement dès le départ
-    openTab('main-tab'); // Charger l'onglet principal par défaut
-};
+        // Ajouter les écouteurs d'événements pour recalculer à chaque changement
+        [commonInput, rareInput, epicInput, legendaryInput, boostTypeSelect, badgesInput, 
+         targetAmountInput, targetAmountTerrainsInput, targetTimeInput, timeUnitSelect].forEach(element => {
+            if (element) {
+                element.addEventListener('input', calculateAll);
+            }
+        });
+
+        // Assurer que les onglets fonctionnent correctement dès le départ
+        openTab('main-tab'); // Charger l'onglet principal par défaut
+    } else {
+        console.error('Un ou plusieurs éléments HTML sont manquants.');
+    }
+});
 
 // Fonction pour gérer les onglets
 function openTab(tabName) {
@@ -46,13 +66,19 @@ function openTab(tabName) {
     for (let tab of tabs) {
         tab.classList.remove('active');
     }
-    document.getElementById(tabName).classList.add('active');
+    const activeTab = document.getElementById(tabName);
+    if (activeTab) {
+        activeTab.classList.add('active');
+    }
 
     const buttons = document.getElementsByClassName('tab-button');
     for (let button of buttons) {
         button.classList.remove('active');
     }
-    document.querySelector(`.tab-button[onclick="openTab('${tabName}')"]`).classList.add('active');
+    const activeButton = document.querySelector(`.tab-button[onclick="openTab('${tabName}')"]`);
+    if (activeButton) {
+        activeButton.classList.add('active');
+    }
 
     // Forcer un recalcul après changement d'onglet
     calculateAll();
@@ -94,12 +120,12 @@ function calculateAll() {
 
 // Calculer les revenus actuels
 function calculateIncome() {
-    const common = parseInt(document.getElementById('common').value) || 0;
-    const rare = parseInt(document.getElementById('rare').value) || 0;
-    const epic = parseInt(document.getElementById('epic').value) || 0;
-    const legendary = parseInt(document.getElementById('legendary').value) || 0;
-    const boostType = document.getElementById('boost-type').value;
-    const badges = parseInt(document.getElementById('badges').value) || 0;
+    const common = parseInt(document.getElementById('common')?.value) || 0;
+    const rare = parseInt(document.getElementById('rare')?.value) || 0;
+    const epic = parseInt(document.getElementById('epic')?.value) || 0;
+    const legendary = parseInt(document.getElementById('legendary')?.value) || 0;
+    const boostType = document.getElementById('boost-type')?.value || 'inactive';
+    const badges = parseInt(document.getElementById('badges')?.value) || 0;
 
     // Total des parcelles
     const totalParcels = common + rare + epic + legendary;
@@ -130,25 +156,33 @@ function calculateIncome() {
     const yearly = totalPerSecond * 31536000;
 
     // Afficher les résultats, avec une gestion des valeurs nulles ou négatives
-    document.getElementById('hourly').textContent = `$${hourly.toFixed(6) || '0.000000'}`;
-    document.getElementById('daily').textContent = `$${daily.toFixed(6) || '0.000000'}`;
-    document.getElementById('weekly').textContent = `$${weekly.toFixed(6) || '0.000000'}`;
-    document.getElementById('monthly').textContent = `$${monthly.toFixed(6) || '0.000000'}`;
-    document.getElementById('yearly').textContent = `$${yearly.toFixed(6) || '0.000000'}`;
+    const hourlySpan = document.getElementById('hourly');
+    const dailySpan = document.getElementById('daily');
+    const weeklySpan = document.getElementById('weekly');
+    const monthlySpan = document.getElementById('monthly');
+    const yearlySpan = document.getElementById('yearly');
+    const badgeBoostSpan = document.getElementById('badge-boost');
+    const mainBoostSpan = document.getElementById('main-boost');
 
-    // Afficher les boosts
-    const badgePercent = ((getBadgeBoost(badges) - 1) * 100).toFixed(0);
-    document.getElementById('badge-boost').textContent = `${badgePercent}%`;
-    document.getElementById('main-boost').textContent = `x${mainBoost}`;
+    if (hourlySpan) hourlySpan.textContent = `$${hourly.toFixed(6) || '0.000000'}`;
+    if (dailySpan) dailySpan.textContent = `$${daily.toFixed(6) || '0.000000'}`;
+    if (weeklySpan) weeklySpan.textContent = `$${weekly.toFixed(6) || '0.000000'}`;
+    if (monthlySpan) monthlySpan.textContent = `$${monthly.toFixed(6) || '0.000000'}`;
+    if (yearlySpan) yearlySpan.textContent = `$${yearly.toFixed(6) || '0.000000'}`;
+    if (badgeBoostSpan) {
+        const badgePercent = ((getBadgeBoost(badges) - 1) * 100).toFixed(0);
+        badgeBoostSpan.textContent = `${badgePercent}%`;
+    }
+    if (mainBoostSpan) mainBoostSpan.textContent = `x${mainBoost}`;
 
     // Sauvegarder les données
     const data = { 
         common, rare, epic, legendary, 
         boostType, badges, 
-        targetAmount: document.getElementById('target-amount').value, 
-        targetAmountTerrains: document.getElementById('target-amount-terrains').value, 
-        targetTime: document.getElementById('target-time').value, 
-        timeUnit: document.getElementById('time-unit').value 
+        targetAmount: document.getElementById('target-amount')?.value || 0, 
+        targetAmountTerrains: document.getElementById('target-amount-terrains')?.value || 0, 
+        targetTime: document.getElementById('target-time')?.value || 0, 
+        timeUnit: document.getElementById('time-unit')?.value || 'hours' 
     };
     localStorage.setItem('atlasEarthData', JSON.stringify(data));
 }
@@ -156,34 +190,54 @@ function calculateIncome() {
 // Incrémenter une parcelle
 function increment(type) {
     const input = document.getElementById(type);
-    input.value = (parseInt(input.value) || 0) + 1;
-    calculateAll();
+    if (input) {
+        input.value = (parseInt(input.value) || 0) + 1;
+        calculateAll();
+    }
 }
 
 // Réinitialiser les données
 function resetData() {
-    localStorage.removeItem('atlasEarthData');
-    document.getElementById('common').value = 0;
-    document.getElementById('rare').value = 0;
-    document.getElementById('epic').value = 0;
-    document.getElementById('legendary').value = 0;
-    document.getElementById('boost-type').value = 'inactive';
-    document.getElementById('badges').value = 0;
-    document.getElementById('target-amount').value = 0;
-    document.getElementById('target-amount-terrains').value = 0;
-    document.getElementById('target-time').value = 0;
-    document.getElementById('time-unit').value = 'hours';
-    calculateAll();
+    const commonInput = document.getElementById('common');
+    const rareInput = document.getElementById('rare');
+    const epicInput = document.getElementById('epic');
+    const legendaryInput = document.getElementById('legendary');
+    const boostTypeSelect = document.getElementById('boost-type');
+    const badgesInput = document.getElementById('badges');
+    const targetAmountInput = document.getElementById('target-amount');
+    const targetAmountTerrainsInput = document.getElementById('target-amount-terrains');
+    const targetTimeInput = document.getElementById('target-time');
+    const timeUnitSelect = document.getElementById('time-unit');
+
+    if (commonInput && rareInput && epicInput && legendaryInput && boostTypeSelect && badgesInput && 
+        targetAmountInput && targetAmountTerrainsInput && targetTimeInput && timeUnitSelect) {
+        commonInput.value = 0;
+        rareInput.value = 0;
+        epicInput.value = 0;
+        legendaryInput.value = 0;
+        boostTypeSelect.value = 'inactive';
+        badgesInput.value = 0;
+        targetAmountInput.value = 0;
+        targetAmountTerrainsInput.value = 0;
+        targetTimeInput.value = 0;
+        timeUnitSelect.value = 'hours';
+        localStorage.removeItem('atlasEarthData');
+        calculateAll();
+    }
 }
 
 // Calculer les prévisions (automatique)
 function calculateForecasts() {
-    const common = parseInt(document.getElementById('common').value) || 0;
-    const rare = parseInt(document.getElementById('rare').value) || 0;
-    const epic = parseInt(document.getElementById('epic').value) || 0;
-    const legendary = parseInt(document.getElementById('legendary').value) || 0;
-    const boostType = document.getElementById('boost-type').value;
-    const badges = parseInt(document.getElementById('badges').value) || 0;
+    const common = parseInt(document.getElementById('common')?.value) || 0;
+    const rare = parseInt(document.getElementById('rare')?.value) || 0;
+    const epic = parseInt(document.getElementById('epic')?.value) || 0;
+    const legendary = parseInt(document.getElementById('legendary')?.value) || 0;
+    const boostType = document.getElementById('boost-type')?.value || 'inactive';
+    const badges = parseInt(document.getElementById('badges')?.value) || 0;
+    const targetAmount = parseFloat(document.getElementById('target-amount')?.value) || 0;
+    const targetAmountTerrains = parseFloat(document.getElementById('target-amount-terrains')?.value) || 0;
+    const targetTime = parseFloat(document.getElementById('target-time')?.value) || 0;
+    const timeUnit = document.getElementById('time-unit')?.value || 'hours';
 
     // Total des parcelles actuelles
     const totalParcels = common + rare + epic + legendary;
@@ -198,11 +252,9 @@ function calculateForecasts() {
     } else if (boostType === 'daily') {
         mainBoost = getDailyBoost(totalParcels);
     }
-
     const totalPerSecond = basePerSecond * badgeBoost * mainBoost;
 
     // 1. Temps pour gagner X € (avec vos données actuelles)
-    const targetAmount = parseFloat(document.getElementById('target-amount').value) || 0;
     if (targetAmount > 0 && totalPerSecond > 0) {
         const secondsNeeded = targetAmount / totalPerSecond;
         let timeResult = '';
@@ -217,16 +269,14 @@ function calculateForecasts() {
         } else {
             timeResult = `${(secondsNeeded / 2592000).toFixed(2)} mois`;
         }
-        document.getElementById('time-result').textContent = timeResult;
+        const timeResultSpan = document.getElementById('time-result');
+        if (timeResultSpan) timeResultSpan.textContent = timeResult;
     } else {
-        document.getElementById('time-result').textContent = '0 secondes';
+        const timeResultSpan = document.getElementById('time-result');
+        if (timeResultSpan) timeResultSpan.textContent = '0 secondes';
     }
 
     // 2. Terrains nécessaires pour X € en X temps
-    const targetAmountTerrains = parseFloat(document.getElementById('target-amount-terrains').value) || 0;
-    const targetTime = parseFloat(document.getElementById('target-time').value) || 0;
-    const timeUnit = document.getElementById('time-unit').value;
-
     let targetSeconds = 0;
     switch (timeUnit) {
         case 'hours':
@@ -257,20 +307,3 @@ function calculateForecasts() {
                 totalNewTerrains++;
                 additionalRevenueNeeded -= RATES.common;
             } else if (random < RARITY.common + RARITY.rare) {
-                totalNewTerrains++;
-                additionalRevenueNeeded -= RATES.rare;
-            } else if (random < RARITY.common + RARITY.rare + RARITY.epic) {
-                totalNewTerrains++;
-                additionalRevenueNeeded -= RATES.epic;
-            } else {
-                totalNewTerrains++;
-                additionalRevenueNeeded -= RATES.legendary;
-            }
-        }
-
-        // Afficher le résultat arrondi
-        document.getElementById('terrains-result').textContent = Math.max(0, Math.ceil(totalNewTerrains));
-    } else {
-        document.getElementById('terrains-result').textContent = '0';
-    }
-}
