@@ -69,6 +69,8 @@ function openTab(tabName) {
     const activeTab = document.getElementById(tabName);
     if (activeTab) {
         activeTab.classList.add('active');
+    } else {
+        console.error(`Onglet ${tabName} non trouvé.`);
     }
 
     const buttons = document.getElementsByClassName('tab-button');
@@ -78,6 +80,8 @@ function openTab(tabName) {
     const activeButton = document.querySelector(`.tab-button[onclick="openTab('${tabName}')"]`);
     if (activeButton) {
         activeButton.classList.add('active');
+    } else {
+        console.error(`Bouton pour onglet ${tabName} non trouvé.`);
     }
 
     // Forcer un recalcul après changement d'onglet
@@ -127,6 +131,8 @@ function calculateIncome() {
     const boostType = document.getElementById('boost-type')?.value || 'inactive';
     const badges = parseInt(document.getElementById('badges')?.value) || 0;
 
+    console.log('Données saisies - Terrains:', { common, rare, epic, legendary }, 'Badges:', badges, 'Boost:', boostType);
+
     // Total des parcelles
     const totalParcels = common + rare + epic + legendary;
 
@@ -135,7 +141,8 @@ function calculateIncome() {
                           epic * RATES.epic + legendary * RATES.legendary) || 0;
     
     // Appliquer le boost des badges d'abord
-    const badgeBoostedPerSecond = basePerSecond * getBadgeBoost(badges);
+    const badgeBoost = getBadgeBoost(badges);
+    const badgeBoostedPerSecond = basePerSecond * badgeBoost;
 
     // Déterminer le boost principal
     let mainBoost = 1;
@@ -149,11 +156,11 @@ function calculateIncome() {
     const totalPerSecond = badgeBoostedPerSecond * mainBoost;
 
     // Conversions
-    const hourly = totalPerSecond * 3600;
-    const daily = totalPerSecond * 86400;
-    const weekly = totalPerSecond * 604800;
-    const monthly = totalPerSecond * 2592000;
-    const yearly = totalPerSecond * 31536000;
+    const hourly = totalPerSecond * 3600 || 0;
+    const daily = totalPerSecond * 86400 || 0;
+    const weekly = totalPerSecond * 604800 || 0;
+    const monthly = totalPerSecond * 2592000 || 0;
+    const yearly = totalPerSecond * 31536000 || 0;
 
     // Afficher les résultats, avec une gestion des valeurs nulles ou négatives
     const hourlySpan = document.getElementById('hourly');
